@@ -1,0 +1,125 @@
+{
+  "types": {
+    "http": {
+      "gref_hash": "5cfa57fe83d1201eb831cc168a5dbe9decaa6010603df244ca6855f2fe61440c",
+      "type": "http:Root"
+    }
+  },
+  "imports": [
+    {
+      "name": "http",
+      "schema": {
+        "types": [
+          {
+            "name": "Root",
+            "actions": [],
+            "fields": [
+              {
+                "name": "resource",
+                "type": "Resource",
+                "params": [
+                  {
+                    "name": "url",
+                    "type": "String"
+                  },
+                  {
+                    "name": "method",
+                    "type": "String"
+                  },
+                  {
+                    "name": "headers",
+                    "type": "String"
+                  },
+                  {
+                    "name": "body",
+                    "type": "String"
+                  }
+                ]
+              }
+            ],
+            "events": []
+          },
+          {
+            "name": "Resource",
+            "actions": [],
+            "fields": [
+              {
+                "name": "body",
+                "type": "String",
+                "params": []
+              },
+              {
+                "name": "headers",
+                "type": "String",
+                "params": []
+              }
+            ],
+            "events": []
+          }
+        ],
+        "imports": [
+          {
+            "name": "sys-http",
+            "schema": {
+              "types": [
+                {
+                  "name": "Root",
+                  "actions": [],
+                  "fields": [
+                    {
+                      "name": "resource",
+                      "type": "Resource",
+                      "params": [
+                        {
+                          "name": "url",
+                          "type": "String"
+                        },
+                        {
+                          "name": "method",
+                          "type": "String"
+                        },
+                        {
+                          "name": "headers",
+                          "type": "String"
+                        },
+                        {
+                          "name": "body",
+                          "type": "String"
+                        }
+                      ]
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "name": "Resource",
+                  "actions": [],
+                  "fields": [
+                    {
+                      "name": "body",
+                      "type": "String",
+                      "params": []
+                    },
+                    {
+                      "name": "headers",
+                      "type": "String",
+                      "params": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "imports": []
+            },
+            "source": {
+              "Program": "unknown"
+            }
+          }
+        ]
+      },
+      "source": {
+        "Program": "tbd"
+      }
+    }
+  ]
+}

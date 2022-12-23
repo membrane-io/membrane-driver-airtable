@@ -1,0 +1,12 @@
+{
+  "name": "airtable",
+  "version": "0.0.1",
+  "description": "Membrane driver for Airtable",
+  "main": "index.js",
+  "author": "Juan Campa",
+  "license": "MIT",
+  "dependencies": {
+    "querystring": "^0.2.1",
+    "url": "^0.11.0"
+  }
+}

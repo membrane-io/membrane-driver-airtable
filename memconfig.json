@@ -1,0 +1,183 @@
+{
+  "dependencies": {
+    "http": "http:"
+  },
+  "config": {},
+  "schema": {
+    "types": [
+      {
+        "name": "Root",
+        "fields": [
+          {
+            "name": "table",
+            "type": "Table",
+            "params": [
+              {
+                "name": "name",
+                "type": "String"
+              }
+            ]
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "Table",
+        "fields": [
+          {
+            "name": "name",
+            "type": "String"
+          },
+          {
+            "name": "records",
+            "type": "RecordCollection"
+          }
+        ],
+        "actions": [
+          {
+            "name": "createRecord",
+            "type": "Int",
+            "params": [
+              {
+                "name": "fields",
+                "type": "String"
+              }
+            ]
+          },
+          {
+            "name": "deleteRecord",
+            "type": "Int",
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              }
+            ]
+          },
+          {
+            "name": "updateRecord",
+            "type": "Int",
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              },
+              {
+                "name": "fields",
+                "type": "String"
+              }
+            ]
+          }
+        ],
+        "events": []
+      },
+      {
+        "name": "RecordCollection",
+        "fields": [
+          {
+            "name": "one",
+            "type": "Record",
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              }
+            ]
+          },
+          {
+            "name": "page",
+            "type": "RecordPage",
+            "params": [
+              {
+                "name": "offset",
+                "type": "String"
+              },
+              {
+                "name": "filterByFormula",
+                "type": "String"
+              },
+              {
+                "name": "maxRecords",
+                "type": "Int"
+              },
+              {
+                "name": "pageSize",
+                "type": "Int"
+              },
+              {
+                "name": "sort",
+                "type": "String"
+              },
+              {
+                "name": "view",
+                "type": "String"
+              },
+              {
+                "name": "cellFormat",
+                "type": "String"
+              },
+              {
+                "name": "timeZone",
+                "type": "String"
+              },
+              {
+                "name": "userLocale",
+                "type": "String"
+              }
+            ]
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "RecordPage",
+        "fields": [
+          {
+            "name": "items",
+            "type": "List",
+            "ofType": {
+              "type": "Record"
+            }
+          },
+          {
+            "name": "next",
+            "type": "Ref",
+            "ofType": {
+              "type": "RecordPage"
+            }
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "Record",
+        "fields": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "createdTime",
+            "type": "String"
+          },
+          {
+            "name": "self",
+            "type": "Ref",
+            "ofType": {
+              "type": "Record"
+            }
+          },
+          {
+            "name": "fields",
+            "type": "String"
+          }
+        ],
+        "actions": [],
+        "events": []
+      }
+    ]
+  }
+}
