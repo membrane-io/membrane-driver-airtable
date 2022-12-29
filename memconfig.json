@@ -1,8 +1,4 @@
 {
-  "dependencies": {
-    "http": "http:"
-  },
-  "config": {},
   "schema": {
     "types": [
       {
@@ -17,9 +13,28 @@
                 "type": "String"
               }
             ]
+          },
+          {
+            "name": "status",
+            "type": "String"
           }
         ],
-        "actions": [],
+        "actions": [
+          {
+            "name": "configure",
+            "type": "Void",
+            "params": [
+              {
+                "name": "API_KEY",
+                "type": "String"
+              },
+              {
+                "name": "BASE_ID",
+                "type": "String"
+              }
+            ]
+          }
+        ],
         "events": []
       },
       {
@@ -164,20 +179,19 @@
             "type": "String"
           },
           {
-            "name": "self",
-            "type": "Ref",
-            "ofType": {
-              "type": "Record"
-            }
-          },
-          {
             "name": "fields",
-            "type": "String"
+            "type": "String",
+            "hints": {
+              "primary": true
+            }
           }
         ],
         "actions": [],
         "events": []
       }
     ]
+  },
+  "dependencies": {
+    "http": "http:"
   }
 }
