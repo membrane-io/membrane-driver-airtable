@@ -59,30 +59,6 @@
                 "type": "String"
               }
             ]
-          },
-          {
-            "name": "deleteRecord",
-            "type": "Int",
-            "params": [
-              {
-                "name": "id",
-                "type": "String"
-              }
-            ]
-          },
-          {
-            "name": "updateRecord",
-            "type": "Int",
-            "params": [
-              {
-                "name": "id",
-                "type": "String"
-              },
-              {
-                "name": "fields",
-                "type": "String"
-              }
-            ]
           }
         ],
         "events": []
@@ -172,21 +148,40 @@
         "fields": [
           {
             "name": "id",
-            "type": "String"
-          },
-          {
-            "name": "createdTime",
-            "type": "String"
-          },
-          {
-            "name": "fields",
             "type": "String",
             "hints": {
               "primary": true
             }
+          },
+          {
+            "name": "createdTime",
+            "type": "String",
+            "hints": {
+              "primary": true
+            }
+          },
+          {
+            "name": "fields",
+            "type": "String"
           }
         ],
-        "actions": [],
+        "actions": [
+          {
+            "name": "deleteRecord",
+            "type": "Int",
+            "params": []
+          },
+          {
+            "name": "updateRecord",
+            "type": "Int",
+            "params": [
+              {
+                "name": "fields",
+                "type": "String"
+              }
+            ]
+          }
+        ],
         "events": []
       }
     ]

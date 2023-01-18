@@ -1,4 +1,4 @@
-# Slack Connector
+# Airtable Driver
 
 This [driver](https://membrane.io) lets you interact with the Airtable API.
 

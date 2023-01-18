@@ -13,9 +13,7 @@ async function api(
   body?: string
 ) {
   if (!state.API_KEY) {
-    throw new Error(
-      "You must authenticated to use this API. Visit the program's /auth endpoint"
-    );
+    throw new Error("You must authenticated to use this API.");
   }
   if (query) {
     Object.keys(query).forEach((key) =>
@@ -74,21 +72,6 @@ export const Table = {
       JSON.stringify({ records: [{ fields }] })
     );
   },
-  async deleteRecord({ args, self }) {
-    const { name } = self.$argsAt(root.table);
-    await api("DELETE", baseUrl, `${name}/${args.id}`);
-  },
-  async updateRecord({ args, self }) {
-    const { name } = self.$argsAt(root.table);
-    const fields = JSON.parse(args.fields);
-    await api(
-      "PATCH",
-      baseUrl,
-      `${name}/${args.id}`,
-      null,
-      JSON.stringify({ fields })
-    );
-  },
 };
 
 export const RecordCollection = {
@@ -125,6 +108,23 @@ export const Record = {
     const { name } = self.$argsAt(root.table);
 
     return root.table({ name }).records.one({ id: obj.id });
+  },
+  async deleteRecord({ args, self }) {
+    const { name } = self.$argsAt(root.table);
+    const { id } = self.$argsAt(root.table.records.one);
+    await api("DELETE", baseUrl, `${name}/${id}`);
+  },
+  async updateRecord({ args, self }) {
+    const { name } = self.$argsAt(root.table);
+    const { id } = self.$argsAt(root.table.records.one);
+    const fields = JSON.parse(args.fields);
+    await api(
+      "PATCH",
+      baseUrl,
+      `${name}/${id}`,
+      null,
+      JSON.stringify({ fields })
+    );
   },
   fields({ obj }) {
     return JSON.stringify(obj.fields);
