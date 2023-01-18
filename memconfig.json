@@ -5,13 +5,9 @@
         "name": "Root",
         "fields": [
           {
-            "name": "table",
-            "type": "Table",
+            "name": "tables",
+            "type": "TableCollection",
             "params": [
-              {
-                "name": "name",
-                "type": "String"
-              }
             ]
           },
           {
@@ -33,15 +29,99 @@
                 "type": "String"
               }
             ]
+          },
+          {
+            "name": "endpoint",
+            "type": "String",
+            "hints": {
+              "hidden": true
+            },
+            "params": [
+              {
+                "name": "method",
+                "type": "String"
+              },
+              {
+                "name": "body",
+                "type": "String"
+              },
+              {
+                "name": "path",
+                "type": "String"
+              },
+              {
+                "name": "query",
+                "type": "String"
+              },
+              {
+                "name": "headers",
+                "type": "String"
+              }
+            ]
           }
         ],
+        "events": []
+      },
+      {
+        "name": "TableCollection",
+        "fields": [
+          {
+            "name": "one",
+            "type": "Table",
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              }
+            ]
+          },
+          {
+            "name": "page",
+            "type": "TablePage",
+            "params": [
+            ]
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "TablePage",
+        "fields": [
+          {
+            "name": "items",
+            "type": "List",
+            "ofType": {
+              "type": "Table"
+            }
+          },
+          {
+            "name": "next",
+            "type": "Ref",
+            "ofType": {
+              "type": "TablePage"
+            }
+          }
+        ],
+        "actions": [],
         "events": []
       },
       {
         "name": "Table",
         "fields": [
           {
+            "name": "id",
+            "type": "String"
+          },
+          {
             "name": "name",
+            "type": "String",
+            "hints": {
+              "primary": true
+            }
+          },
+          {
+            "name": "primaryFieldId",
             "type": "String"
           },
           {
@@ -58,6 +138,12 @@
                 "name": "fields",
                 "type": "String"
               }
+            ]
+          },
+          {
+            "name": "createWebhook",
+            "type": "Int",
+            "params": [
             ]
           }
         ],
@@ -187,6 +273,7 @@
     ]
   },
   "dependencies": {
-    "http": "http:"
+    "http": "http:",
+    "endpoint": "sys-process:endpointUrl"
   }
 }
