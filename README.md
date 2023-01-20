@@ -1,7 +1,8 @@
 # Airtable Driver
 
 This [driver](https://membrane.io) lets you interact with the Airtable API.
-## Actions
+
+## Setup
 
 Create your [Personal access token](https://airtable.com/create/tokens) and add the following scopes:
 ```
