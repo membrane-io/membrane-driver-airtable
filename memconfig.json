@@ -156,11 +156,9 @@
         ],
         "events": [
           {
-            "name": "notification",
+            "name": "changed",
             "type": "TableEvent",
-            "params": [
-              { "name": "type", "type": "String" }
-            ]
+            "params": []
           }
         ]
       },
@@ -288,7 +286,8 @@
       {
         "name": "TableEvent",
         "fields": [
-          { "name": "record", "type": "Ref", "ofType": "Record"}
+          { "name": "record", "type": "Ref", "ofType": "Record"},
+          { "name": "type", "type": "String" }
         ]
       }
     ]

@@ -85,7 +85,7 @@ export const Table = {
       JSON.stringify({ records: [{ fields }] })
     );
   },
-  notification: {
+  changed: {
     async subscribe({ self, args: { type } }) {
       const { id: tableId } = self.$argsAt(root.tables.one);
 
@@ -173,10 +173,10 @@ export async function endpoint({ args: { path, query, headers, body } }) {
       // Emit the event based on the action
       switch (changeName) {
         case "createdRecordsById":
-          root.tables.one({ id: tableId }).notification({ type: 'created' }).$emit({ record });
+          root.tables.one({ id: tableId }).changed.$emit({ record, type: 'created' });
           break;
         case "changedRecordsById":
-          root.tables.one({ id: tableId }).notification({ type: 'changed' }).$emit({ record });
+          root.tables.one({ id: tableId }).changed.$emit({ record, type: 'changed'});
           break;
         default:
           break;
