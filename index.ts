@@ -85,26 +85,12 @@ export const Table = {
       JSON.stringify({ records: [{ fields }] })
     );
   },
-  async createWebhook({ args, self }) {
-    const { id } = self.$argsAt(root.tables.one);
-    const body = {
-      notificationUrl: state.endpointUrl + "/receivewebhook",
-      specification: {
-        options: {
-          filters: {
-            dataTypes: ["tableData"],
-            recordChangeScope: id,
-          },
-        },
-      },
-    };
-    await api(
-      "POST",
-      baseUrl,
-      `bases/${state.BASE_ID}/webhooks`,
-      null,
-      JSON.stringify(body)
-    );
+  notification: {
+    async subscribe({ self, args: { type } }) {
+      const { id: tableId } = self.$argsAt(root.tables.one);
+
+      await ensureWebhook(tableId);
+    },
   },
 };
 
@@ -169,7 +155,7 @@ export const Record = {
 
 export async function endpoint({ args: { path, query, headers, body } }) {
   switch (path) {
-    case "/receivewebhook": {
+    case "/webhook": {
       let event = JSON.parse(body);
       const res = await api(
         "GET",
@@ -179,20 +165,18 @@ export async function endpoint({ args: { path, query, headers, body } }) {
       // Get the last payload
       const { payloads } = await res.json();
       const lastPayload = payloads.pop();
-
       // Get the ids of the table, change name and record
       const [tableId] = Object.keys(lastPayload.changedTablesById);
       const [changeName] = Object.keys(lastPayload.changedTablesById[tableId]);
       const [recordId] = Object.keys(lastPayload.changedTablesById[tableId][changeName]);
       const record: any = root.tables.one({ id: tableId }).records.one({ id: recordId });
-      
       // Emit the event based on the action
       switch (changeName) {
         case "createdRecordsById":
-          root.tables.one({ id: tableId }).recordCreated.$emit({ record,  type: "created" });
+          root.tables.one({ id: tableId }).notification({ type: 'created' }).$emit({ record });
           break;
         case "changedRecordsById":
-          root.tables.one({ id: tableId }).recordChanged.$emit({ record, type: "changed" });
+          root.tables.one({ id: tableId }).notification({ type: 'changed' }).$emit({ record });
           break;
         default:
           break;
@@ -202,4 +186,28 @@ export async function endpoint({ args: { path, query, headers, body } }) {
     default:
       console.log("Unknown Endpoint:", path);
   }
+}
+
+async function ensureWebhook(tableId: string) {
+  const body = {
+    notificationUrl: state.endpointUrl + "/webhook",
+    specification: {
+      options: {
+        filters: {
+          dataTypes: ["tableData"],
+          recordChangeScope: tableId,
+        },
+      },
+    },
+  };
+  const res = await api("POST",baseUrl, `bases/${state.BASE_ID}/webhooks`, null, JSON.stringify(body));
+  const { id } = await res.json();
+
+  if (id) {
+    await root.refreshWebhook({ id }).$invokeIn({ seconds: 60 * 60 * 24 * 6, key: id }); // refresh in 6 days
+  }
+}
+
+export async function refreshWebhook({ args: { id } }) {
+  await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
 }

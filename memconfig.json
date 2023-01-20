@@ -30,6 +30,16 @@
             ]
           },
           {
+            "name": "refreshWebhook",
+            "type": "Void",
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              }
+            ]
+          },
+          {
             "name": "endpoint",
             "type": "String",
             "hints": {
@@ -146,12 +156,11 @@
         ],
         "events": [
           {
-            "name": "recordCreated",
-            "type": "CreatedEvent"
-          },
-          {
-            "name": "recordChanged",
-            "type": "CreatedEvent"
+            "name": "notification",
+            "type": "TableEvent",
+            "params": [
+              { "name": "type", "type": "String" }
+            ]
           }
         ]
       },
@@ -277,10 +286,9 @@
         "events": []
       },
       {
-        "name": "CreatedEvent",
+        "name": "TableEvent",
         "fields": [
-          { "name": "record", "type": "Ref", "ofType": "Record"},
-          { "name": "type", "type": "String"}
+          { "name": "record", "type": "Ref", "ofType": "Record"}
         ]
       }
     ]
