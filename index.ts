@@ -171,21 +171,21 @@ export async function endpoint({ args: { path, query, headers, body } }) {
   switch (path) {
     case "/receivewebhook": {
       let event = JSON.parse(body);
-
       const res = await api(
         "GET",
         baseUrl,
         `bases/${state.BASE_ID}/webhooks/${event.webhook.id}/payloads`
       );
-
+      // Get all payloads from the webhook
       const { payloads } = await res.json();
+      // Get the last payload
       const lastPayload = payloads.pop();
-
+      // Get the ids of the table, change and record
       const [tableId] = Object.keys(lastPayload.changedTablesById);
       const [changeName] = Object.keys(lastPayload.changedTablesById[tableId]);
       const [recordId] = Object.keys(lastPayload.changedTablesById[tableId][changeName]);
       const record: any = root.tables.one({ id: tableId }).records.one({ id: recordId });
-      
+      // Emit the event based on the action
       switch (changeName) {
         case "createdRecordsById":
           root.tables.one({ id: tableId }).recordCreated.$emit({ record,  type: "created" });
