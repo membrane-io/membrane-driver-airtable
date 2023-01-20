@@ -1,20 +1,19 @@
 # Airtable Driver
 
 This [driver](https://membrane.io) lets you interact with the Airtable API.
-
-## Usage
-
-1. Install the [Membrane VSCode Extension](https://marketplace.visualstudio.com/items?itemName=membrane.membrane).
-2. Setup on extension your [Membrane's CLI binary (mctl)](https://membrane.io/download) path.
-3. Login / Sign up with ```mctl login```.
-4. Update the program on Membrane with the VSCode Command palette `(cmd+shift+p)`\
-  ```> Membrame: Update current program```
-
 ## Actions
 
-Configure the connector to use your [API Key](https://airtable.com/account) and [Base ID](https://support.airtable.com/docs/understanding-airtable-ids)
+Create your [Personal access token](https://airtable.com/create/tokens) and add the following scopes:
+```
+data.records:read
+data.records:write
+schema.bases:read
+webhook:manage
+```
+Configure the connector to use the Token and [Base ID](https://support.airtable.com/docs/understanding-airtable-ids)
 
-$~~~~$ `mctl action 'airtable:configure(API_KEY:"", BASE_ID"")'`
+
+$~~~~$ `mctl action 'airtable:configure(API_KEY:"<Token>",BASE_ID:"<BaseId>")'`
 
 # Schema
 

@@ -45,7 +45,8 @@ export const Root = {
     }
   },
   tables: () => ({}),
-  configure: ({ args: { API_KEY, BASE_ID } }) => {
+  configure: async ({ args: { API_KEY, BASE_ID } }) => {
+    state.endpointUrl = state.endpointUrl ?? (await nodes.endpoint.$get());
     state.API_KEY = API_KEY;
     state.BASE_ID = BASE_ID;
   },
@@ -55,14 +56,14 @@ export const TableCollection = {
   async one({ args, self }) {
     const res = await api("GET", baseUrl, `meta/bases/${state.BASE_ID}/tables`);
     const { tables } = await res.json();
-  
+
     return tables.find((table) => table.id === args.id);
   },
   async page({ args, self }) {
     const res = await api("GET", baseUrl, `meta/bases/${state.BASE_ID}/tables`);
     const { tables } = await res.json();
-    
-    return { items: tables , next: null};
+
+    return { items: tables, next: null };
   },
 };
 
@@ -97,7 +98,13 @@ export const Table = {
         },
       },
     };
-    await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks`, null, JSON.stringify(body));
+    await api(
+      "POST",
+      baseUrl,
+      `bases/${state.BASE_ID}/webhooks`,
+      null,
+      JSON.stringify(body)
+    );
   },
 };
 
@@ -110,7 +117,9 @@ export const RecordCollection = {
   },
   async page({ args, self }) {
     const { id } = self.$argsAt(root.tables.one);
-    const res = await api("GET", baseUrl, `${state.BASE_ID}/${id}`, { ...args });
+    const res = await api("GET", baseUrl, `${state.BASE_ID}/${id}`, {
+      ...args,
+    });
 
     return await res.json();
   },
@@ -161,42 +170,33 @@ export const Record = {
 export async function endpoint({ args: { path, query, headers, body } }) {
   switch (path) {
     case "/receivewebhook": {
-      const data = JSON.parse(body);
-      // id of data.webhook.id use to get the payload
+      let event = JSON.parse(body);
+
+      const res = await api(
+        "GET",
+        baseUrl,
+        `bases/${state.BASE_ID}/webhooks/${event.webhook.id}/payloads`
+      );
+
+      const { payloads } = await res.json();
+      const lastPayload = payloads.pop();
+
+      const [tableId] = Object.keys(lastPayload.changedTablesById);
+      const [changeName] = Object.keys(lastPayload.changedTablesById[tableId]);
+      const [recordId] = Object.keys(lastPayload.changedTablesById[tableId][changeName]);
+      const record: any = root.tables.one({ id: tableId }).records.one({ id: recordId });
       
-      const res = await api("GET", baseUrl, `bases/${state.BASE_ID}/webhooks/${data.webhook.id}/payloads`);
-      // this get the last payload array of payloads
-      //
-      // {
-      //   "timestamp": "2023-01-18T16:04:33.796Z",
-      //   "baseTransactionNumber": 2149,
-      //   "actionMetadata": {
-      //     "source": "client",
-      //     "sourceMetadata": {
-      //       "user": {
-      //         "id": "usrAOCP3FUUlOs9ta",
-      //         "email": "jhonnyjosearana@gmail.com",
-      //         "permissionLevel": "create",
-      //         "name": "jhonny arana",
-      //         "profilePicUrl": "https://static.airtable.com/images/userIcons/user_icon_9.png"
-      //       }
-      //     }
-      //   },
-      //   "payloadFormat": "v0",
-      //   "changedTablesById": {
-      //     "tblWX4FnYbtquOjIK": {
-      //       "changedRecordsById": {
-      //         "recJVlmvLuTQNfMFP": {
-      //           "current": {
-      //             "cellValuesByFieldId": {
-      //               "fldTCMRSH5WHfHLWX": "2"
-      //             }
-      //           }
-      //         }
-      //       }
-      //     }
-      //   }
-      // }
+      switch (changeName) {
+        case "createdRecordsById":
+          root.tables.one({ id: tableId }).recordCreated.$emit({ record,  type: "created" });
+          break;
+        case "changedRecordsById":
+          root.tables.one({ id: tableId }).recordChanged.$emit({ record, type: "changed" });
+          break;
+        default:
+          break;
+      }
+      break;
     }
     default:
       console.log("Unknown Endpoint:", path);

@@ -7,8 +7,7 @@
           {
             "name": "tables",
             "type": "TableCollection",
-            "params": [
-            ]
+            "params": []
           },
           {
             "name": "status",
@@ -78,8 +77,7 @@
           {
             "name": "page",
             "type": "TablePage",
-            "params": [
-            ]
+            "params": []
           }
         ],
         "actions": [],
@@ -143,11 +141,23 @@
           {
             "name": "createWebhook",
             "type": "Int",
-            "params": [
-            ]
+            "params": []
           }
         ],
-        "events": []
+        "events": [
+          {
+            "name": "recordCreated",
+            "type": "CreatedEvent"
+          },
+          {
+            "name": "recordDestroyed",
+            "type": "CreatedEvent"
+          },
+          {
+            "name": "recordChanged",
+            "type": "CreatedEvent"
+          }
+        ]
       },
       {
         "name": "RecordCollection",
@@ -269,6 +279,13 @@
           }
         ],
         "events": []
+      },
+      {
+        "name": "CreatedEvent",
+        "fields": [
+          { "name": "record", "type": "Ref", "ofType": "Record"},
+          { "name": "type", "type": "String"}
+        ]
       }
     ]
   },
