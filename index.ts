@@ -175,6 +175,9 @@ export async function endpoint({ args: { path, query, headers, body } }) {
         case "createdRecordsById":
           root.tables.one({ id: tableId }).changed.$emit({ record, type: 'created' });
           break;
+        case "destroyedRecordsById":
+          root.tables.one({ id: tableId }).changed.$emit({ record, type: 'destroyed' });
+          break;
         case "changedRecordsById":
           root.tables.one({ id: tableId }).changed.$emit({ record, type: 'changed'});
           break;
