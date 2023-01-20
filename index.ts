@@ -166,28 +166,40 @@ export async function endpoint({ args: { path, query, headers, body } }) {
       const { payloads } = await res.json();
       const lastPayload = payloads.pop();
       // Get the ids of the table, change name and record
-      const [tableId] = Object.keys(lastPayload.changedTablesById);
-      const [changeName] = Object.keys(lastPayload.changedTablesById[tableId]);
-      const [recordId] = Object.keys(lastPayload.changedTablesById[tableId][changeName]);
-      const record: any = root.tables.one({ id: tableId }).records.one({ id: recordId });
-      // Emit the event based on the action
-      switch (changeName) {
-        case "createdRecordsById":
-          root.tables.one({ id: tableId }).changed.$emit({ record, type: 'created' });
-          break;
-        case "destroyedRecordsById":
-          root.tables.one({ id: tableId }).changed.$emit({ record, type: 'destroyed' });
-          break;
-        case "changedRecordsById":
-          root.tables.one({ id: tableId }).changed.$emit({ record, type: 'changed'});
-          break;
-        default:
-          break;
-      }
+      const tables = Object.keys(lastPayload.changedTablesById);
+      tables.forEach((tableId) => {
+        const [changeName] = Object.keys(
+          lastPayload.changedTablesById[tableId]
+        );
+        const records = Object.keys(
+          lastPayload.changedTablesById[tableId][changeName]
+        );
+        records.forEach((id) => {
+          const record: any = root.tables.one({ id: tableId }).records.one({ id: id });
+          dispatchEvent(changeName, tableId, record);
+        });
+      });
       break;
     }
     default:
       console.log("Unknown Endpoint:", path);
+  }
+}
+
+async function dispatchEvent(changeName: string, tableId: string, record: any) {
+  // Emit the event based on the action
+  switch (changeName) {
+    case "createdRecordsById":
+      root.tables.one({ id: tableId }).changed.$emit({ record, type: "created" });
+      break;
+    case "destroyedRecordsById":
+      root.tables.one({ id: tableId }).changed.$emit({ record, type: "destroyed" });
+      break;
+    case "changedRecordsById":
+      root.tables.one({ id: tableId }).changed.$emit({ record, type: "changed" });
+      break;
+    default:
+      break;
   }
 }
 
