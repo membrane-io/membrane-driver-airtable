@@ -176,15 +176,16 @@ export async function endpoint({ args: { path, query, headers, body } }) {
         baseUrl,
         `bases/${state.BASE_ID}/webhooks/${event.webhook.id}/payloads`
       );
-      // Get all payloads from the webhook
-      const { payloads } = await res.json();
       // Get the last payload
+      const { payloads } = await res.json();
       const lastPayload = payloads.pop();
-      // Get the ids of the table, change and record
+
+      // Get the ids of the table, change name and record
       const [tableId] = Object.keys(lastPayload.changedTablesById);
       const [changeName] = Object.keys(lastPayload.changedTablesById[tableId]);
       const [recordId] = Object.keys(lastPayload.changedTablesById[tableId][changeName]);
       const record: any = root.tables.one({ id: tableId }).records.one({ id: recordId });
+      
       // Emit the event based on the action
       switch (changeName) {
         case "createdRecordsById":

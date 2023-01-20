@@ -150,10 +150,6 @@
             "type": "CreatedEvent"
           },
           {
-            "name": "recordDestroyed",
-            "type": "CreatedEvent"
-          },
-          {
             "name": "recordChanged",
             "type": "CreatedEvent"
           }
