@@ -5,6 +5,8 @@ const baseUrl = `api.airtable.com/v0`;
 
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
+state.webhooks = state.webhooks ?? [];
+
 async function api(
   method: Method,
   domain: string,
@@ -155,30 +157,46 @@ export const Record = {
 
 export async function endpoint({ args: { path, query, headers, body } }) {
   switch (path) {
-    case "/webhook": {
+    case "/incoming-webhook": {
       let event = JSON.parse(body);
+      const config = state.webhooks.find((w) => w.id === event.webhook.id);
       const res = await api(
         "GET",
         baseUrl,
-        `bases/${state.BASE_ID}/webhooks/${event.webhook.id}/payloads`
+        `bases/${state.BASE_ID}/webhooks/${event.webhook.id}/payloads`,
+        { cursor: config?.cursor || 1 }
       );
-      // Get the last payload
-      const { payloads } = await res.json();
-      const lastPayload = payloads.pop();
-      // Get the ids of the table, change name and record
-      const tables = Object.keys(lastPayload.changedTablesById);
-      tables.forEach((tableId) => {
-        const [changeName] = Object.keys(
-          lastPayload.changedTablesById[tableId]
-        );
-        const records = Object.keys(
-          lastPayload.changedTablesById[tableId][changeName]
-        );
-        records.forEach((id) => {
-          const record: any = root.tables.one({ id: tableId }).records.one({ id: id });
-          dispatchEvent(changeName, tableId, record);
-        });
-      });
+      const { payloads, cursor } = await res.json();
+      if (config) {
+        config.cursor = cursor;
+      } else {
+        state.webhooks.push({ id: body.webhook.id, cursor });
+      }
+
+      for (const payload of payloads) {
+        if ("changedTablesById" in payload) {
+          for (const tableId in payload.changedTablesById) {
+            const table = payload.changedTablesById[tableId];
+            if ("createdRecordsById" in table) {
+              for (const recordId in table.createdRecordsById) {
+                dispatchEvent(tableId, recordId, "created");
+              }
+            }
+
+            if ("changedRecordsById" in table) {
+              for (const recordId in table.changedRecordsById) {
+                dispatchEvent(tableId, recordId, "changed");
+              }
+            }
+
+            if ("destroyedRecordIds" in table) {
+              for (const recordId in table.destroyedRecordIds) {
+                dispatchEvent(tableId, recordId, "destroyed");
+              }
+            }
+          }
+        }
+      }
       break;
     }
     default:
@@ -186,26 +204,14 @@ export async function endpoint({ args: { path, query, headers, body } }) {
   }
 }
 
-async function dispatchEvent(changeName: string, tableId: string, record: any) {
-  // Emit the event based on the action
-  switch (changeName) {
-    case "createdRecordsById":
-      root.tables.one({ id: tableId }).changed.$emit({ record, type: "created" });
-      break;
-    case "destroyedRecordsById":
-      root.tables.one({ id: tableId }).changed.$emit({ record, type: "destroyed" });
-      break;
-    case "changedRecordsById":
-      root.tables.one({ id: tableId }).changed.$emit({ record, type: "changed" });
-      break;
-    default:
-      break;
-  }
+async function dispatchEvent(tableId: string, recordId: string, type: string) {
+  const record: any = root.tables.one({ id: tableId }).records.one({ id: recordId });
+  return root.tables.one({ id: tableId }).changed.$emit({ record, type });
 }
 
 async function ensureWebhook(tableId: string) {
   const body = {
-    notificationUrl: state.endpointUrl + "/webhook",
+    notificationUrl: state.endpointUrl + "/incoming-webhook",
     specification: {
       options: {
         filters: {
