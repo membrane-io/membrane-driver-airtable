@@ -170,7 +170,7 @@ export async function endpoint({ args: { path, query, headers, body } }) {
       if (config) {
         config.cursor = cursor;
       } else {
-        state.webhooks.push({ id: body.webhook.id, cursor });
+        state.webhooks.push({ id: event.webhook.id, cursor });
       }
 
       for (const payload of payloads) {
