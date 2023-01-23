@@ -160,11 +160,9 @@ export async function endpoint({ args: { path, query, headers, body } }) {
     case "/incoming-webhook": {
       const event = JSON.parse(body);
       const webhookId = event.webhook.id;
-      console.log(`Webhook event ${webhookId}`);
-
       const config = state.webhooks[webhookId];
       if (!config) {
-        console.log(`Webhook ${webhookId} not found in program state`);
+        console.log(`Webhook ${webhookId} is not part of this program`);
         return;
       }
       const res = await api(
@@ -238,7 +236,7 @@ async function ensureWebhook(tableId: string) {
 
 export async function refreshWebhook({ args: { id } }) {
   if (!state.webhooks[id]) {
-    return console.log(`Error refreshing webhook ${id}, not found in state.`);
+    return console.log(`Error refreshing the webhook ${id}, not found in this program.`);
   }
   return await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
 }
