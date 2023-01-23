@@ -142,13 +142,7 @@ export const Record = {
     const { id: table } = self.$argsAt(root.tables.one);
     const { id } = self.$argsAt(root.tables.one.records.one);
     const fields = JSON.parse(args.fields);
-    await api(
-      "PATCH",
-      baseUrl,
-      `${state.BASE_ID}/${table}/${id}`,
-      null,
-      JSON.stringify({ fields })
-    );
+    await api("PATCH", baseUrl, `${state.BASE_ID}/${table}/${id}`, null, JSON.stringify({ fields }));
   },
   fields({ obj }) {
     return JSON.stringify(obj.fields);
