@@ -5,7 +5,7 @@ const baseUrl = `api.airtable.com/v0`;
 
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
-state.webhooks = state.webhooks ?? [];
+state.webhooks = state.webhooks ?? {};
 
 async function api(
   method: Method,
@@ -79,19 +79,19 @@ export const Table = {
   async createRecord({ args, self }) {
     const { id } = self.$argsAt(root.tables.one);
     const fields = JSON.parse(args.fields);
-    await api(
-      "POST",
-      baseUrl,
-      `${id}`,
-      null,
-      JSON.stringify({ records: [{ fields }] })
-    );
+    await api("POST", baseUrl, `${id}`, null, JSON.stringify({ records: [{ fields }] }));
   },
   changed: {
     async subscribe({ self, args: { type } }) {
       const { id: tableId } = self.$argsAt(root.tables.one);
 
-      await ensureWebhook(tableId);
+      const webhook = await ensureWebhook(tableId);
+      state.webhooks[webhook.id] = { ...webhook, cursor: 1 };
+    },
+    async unsubscribe({ self }) {
+      // args: { webhookId }
+      // delete state.webhooks[webhookId];
+      // return await api("DELETE", baseUrl, `bases/${state.BASE_ID}/webhooks/${webhookId}`);
     },
   },
 };
@@ -158,19 +158,25 @@ export const Record = {
 export async function endpoint({ args: { path, query, headers, body } }) {
   switch (path) {
     case "/incoming-webhook": {
-      let event = JSON.parse(body);
-      const config = state.webhooks.find((w) => w.id === event.webhook.id);
+      const event = JSON.parse(body);
+      const webhookId = event.webhook.id;
+      console.log(`Webhook event ${webhookId}`);
+
+      const config = state.webhooks[webhookId];
+      if (!config) {
+        console.log(`Webhook ${webhookId} not found in program state`);
+        return;
+      }
       const res = await api(
         "GET",
         baseUrl,
-        `bases/${state.BASE_ID}/webhooks/${event.webhook.id}/payloads`,
-        { cursor: config?.cursor || 1 }
+        `bases/${state.BASE_ID}/webhooks/${webhookId}/payloads`,
+        { cursor: config.cursor }
       );
       const { payloads, cursor } = await res.json();
+
       if (config) {
         config.cursor = cursor;
-      } else {
-        state.webhooks.push({ id: event.webhook.id, cursor });
       }
 
       for (const payload of payloads) {
@@ -221,14 +227,18 @@ async function ensureWebhook(tableId: string) {
       },
     },
   };
-  const res = await api("POST",baseUrl, `bases/${state.BASE_ID}/webhooks`, null, JSON.stringify(body));
-  const { id } = await res.json();
+  const res = await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks`, null, JSON.stringify(body));
+  const webhook = await res.json();
 
-  if (id) {
-    await root.refreshWebhook({ id }).$invokeIn({ seconds: 60 * 60 * 24 * 6, key: id }); // refresh in 6 days
+  if (webhook.id) {
+    await root.refreshWebhook({ id: webhook.id }).$invokeIn({ seconds: 60, key: webhook.id }); // refresh in 6 days
   }
+  return webhook;
 }
 
 export async function refreshWebhook({ args: { id } }) {
-  await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
+  if (!state.webhooks[id]) {
+    return console.log(`Error refreshing webhook ${id}, not found in state.`);
+  }
+  return await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
 }

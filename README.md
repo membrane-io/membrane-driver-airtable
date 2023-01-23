@@ -24,26 +24,33 @@ $~~~~$ `mctl action 'airtable:configure(API_KEY:"<Token>",BASE_ID:"<BaseId>")'`
     - Fields
         table -> Ref <Table>
         status() -> String
-    - Events
-        onComand(token) -> <CommandEvent>
 <Table>
     - Fields
+        id -> String
         name -> String
-        records -> <RecordCollections>
+        primaryFieldId -> String
+        records -> Ref <RecordCollections>
     - Actions
-        createRecord(fields) -> Int
-        deleteRecord(id) -> Int
-        updateRecord(id, dields) -> Int
+        createRecord(fields) -> Void
+    - Events
+        changed() -> Ref <TableEvent>
 <RecordCollections>
     - Fields
-       one(id) -> <Record>
-       page -> <RecordPage>
+       one(id) -> Ref <Record>
+       page -> Ref <RecordPage>
 <RecordPage>
     - Fields
         items -> List[] <Record>
-        next -> <RecordPage>
+        next -> Ref <RecordPage>
 <Record>
     - Fields
        id -> String
        createdTime -> String
        fields -> String
+    - Actions 
+        deleteRecord() -> Void
+        updateRecord(fields) -> Void
+<TableEvent>
+    - Fields
+        type -> String
+        record -> Ref <Record>

@@ -32,6 +32,9 @@
           {
             "name": "refreshWebhook",
             "type": "Void",
+            "hints": { 
+              "hidden": true 
+            },
             "params": [
               {
                 "name": "id",
@@ -286,7 +289,7 @@
       {
         "name": "TableEvent",
         "fields": [
-          { "name": "record", "type": "Ref", "ofType": "Record"},
+          { "name": "record", "type": "Ref", "ofType": "Record" },
           { "name": "type", "type": "String" }
         ]
       }
