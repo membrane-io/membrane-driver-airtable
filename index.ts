@@ -82,16 +82,19 @@ export const Table = {
     await api("POST", baseUrl, `${id}`, null, JSON.stringify({ records: [{ fields }] }));
   },
   changed: {
-    async subscribe({ self, args: { type } }) {
+    async subscribe({ self }) {
       const { id: tableId } = self.$argsAt(root.tables.one);
 
       const webhook = await ensureWebhook(tableId);
-      state.webhooks[webhook.id] = { ...webhook, cursor: 1 };
+      state.webhooks[webhook.id] = { ...webhook, cursor: 1, tableId };
     },
     async unsubscribe({ self }) {
-      // args: { webhookId }
-      // delete state.webhooks[webhookId];
-      // return await api("DELETE", baseUrl, `bases/${state.BASE_ID}/webhooks/${webhookId}`);
+      const { id: tableId } = self.$argsAt(root.tables.one);
+      const webhook: any = Object.keys(state.webhooks)
+        .filter((id) => state.webhooks[id].tableId === tableId)
+        .map((id) => state.webhooks[id]);
+      delete state.webhooks[webhook.id];
+      return await api("DELETE", baseUrl, `bases/${state.BASE_ID}/webhooks/${webhook.id}`);
     },
   },
 };
@@ -156,8 +159,7 @@ export async function endpoint({ args: { path, query, headers, body } }) {
       const webhookId = event.webhook.id;
       const config = state.webhooks[webhookId];
       if (!config) {
-        console.log(`Webhook ${webhookId} is not part of this program`);
-        return;
+        throw new Error(`Webhook ${webhookId} is not part of this program`);
       }
       const res = await api(
         "GET",
@@ -223,7 +225,8 @@ async function ensureWebhook(tableId: string) {
   const webhook = await res.json();
 
   if (webhook.id) {
-    await root.refreshWebhook({ id: webhook.id }).$invokeIn({ seconds: 60, key: webhook.id }); // refresh in 6 days
+    // refresh in 6 days
+    await root.refreshWebhook({ id: webhook.id }).$invokeIn({ seconds: 60 * 60 * 24 * 6, key: webhook.id });
   }
   return webhook;
 }
@@ -232,5 +235,7 @@ export async function refreshWebhook({ args: { id } }) {
   if (!state.webhooks[id]) {
     return console.log(`Error refreshing the webhook ${id}, not found in this program.`);
   }
-  return await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
+  await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
+  // ???
+  await root.refreshWebhook({ id }).$invokeIn({ seconds: 60 * 60 * 24 * 6, key: id }); 
 }
