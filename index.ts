@@ -236,6 +236,5 @@ export async function refreshWebhook({ args: { id } }) {
     return console.log(`Error refreshing the webhook ${id}, not found in this program.`);
   }
   await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
-  // ???
   await root.refreshWebhook({ id }).$invokeIn({ seconds: 60 * 60 * 24 * 6, key: id }); 
 }
