@@ -1,22 +1,117 @@
 {
-  "dependencies": {
-    "http": "http:"
-  },
-  "config": {},
   "schema": {
     "types": [
       {
         "name": "Root",
         "fields": [
           {
-            "name": "table",
-            "type": "Table",
+            "name": "tables",
+            "type": "TableCollection",
+            "params": []
+          },
+          {
+            "name": "status",
+            "type": "String"
+          }
+        ],
+        "actions": [
+          {
+            "name": "configure",
+            "type": "Void",
             "params": [
               {
-                "name": "name",
+                "name": "API_KEY",
+                "type": "String"
+              },
+              {
+                "name": "BASE_ID",
                 "type": "String"
               }
             ]
+          },
+          {
+            "name": "refreshWebhook",
+            "type": "Void",
+            "hints": { 
+              "hidden": true 
+            },
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              }
+            ]
+          },
+          {
+            "name": "endpoint",
+            "type": "String",
+            "hints": {
+              "hidden": true
+            },
+            "params": [
+              {
+                "name": "method",
+                "type": "String"
+              },
+              {
+                "name": "body",
+                "type": "String"
+              },
+              {
+                "name": "path",
+                "type": "String"
+              },
+              {
+                "name": "query",
+                "type": "String"
+              },
+              {
+                "name": "headers",
+                "type": "String"
+              }
+            ]
+          }
+        ],
+        "events": []
+      },
+      {
+        "name": "TableCollection",
+        "fields": [
+          {
+            "name": "one",
+            "type": "Table",
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              }
+            ]
+          },
+          {
+            "name": "page",
+            "type": "TablePage",
+            "params": []
+          }
+        ],
+        "actions": [],
+        "events": []
+      },
+      {
+        "name": "TablePage",
+        "fields": [
+          {
+            "name": "items",
+            "type": "List",
+            "ofType": {
+              "type": "Table"
+            }
+          },
+          {
+            "name": "next",
+            "type": "Ref",
+            "ofType": {
+              "type": "TablePage"
+            }
           }
         ],
         "actions": [],
@@ -26,7 +121,18 @@
         "name": "Table",
         "fields": [
           {
+            "name": "id",
+            "type": "String"
+          },
+          {
             "name": "name",
+            "type": "String",
+            "hints": {
+              "primary": true
+            }
+          },
+          {
+            "name": "primaryFieldId",
             "type": "String"
           },
           {
@@ -46,31 +152,18 @@
             ]
           },
           {
-            "name": "deleteRecord",
+            "name": "createWebhook",
             "type": "Int",
-            "params": [
-              {
-                "name": "id",
-                "type": "String"
-              }
-            ]
-          },
-          {
-            "name": "updateRecord",
-            "type": "Int",
-            "params": [
-              {
-                "name": "id",
-                "type": "String"
-              },
-              {
-                "name": "fields",
-                "type": "String"
-              }
-            ]
+            "params": []
           }
         ],
-        "events": []
+        "events": [
+          {
+            "name": "changed",
+            "type": "TableEvent",
+            "params": []
+          }
+        ]
       },
       {
         "name": "RecordCollection",
@@ -157,17 +250,16 @@
         "fields": [
           {
             "name": "id",
-            "type": "String"
+            "type": "String",
+            "hints": {
+              "primary": true
+            }
           },
           {
             "name": "createdTime",
-            "type": "String"
-          },
-          {
-            "name": "self",
-            "type": "Ref",
-            "ofType": {
-              "type": "Record"
+            "type": "String",
+            "hints": {
+              "primary": true
             }
           },
           {
@@ -175,9 +267,36 @@
             "type": "String"
           }
         ],
-        "actions": [],
+        "actions": [
+          {
+            "name": "deleteRecord",
+            "type": "Int",
+            "params": []
+          },
+          {
+            "name": "updateRecord",
+            "type": "Int",
+            "params": [
+              {
+                "name": "fields",
+                "type": "String"
+              }
+            ]
+          }
+        ],
         "events": []
+      },
+      {
+        "name": "TableEvent",
+        "fields": [
+          { "name": "record", "type": "Ref", "ofType": "Record" },
+          { "name": "type", "type": "String" }
+        ]
       }
     ]
+  },
+  "dependencies": {
+    "http": "http:",
+    "endpoint": "sys-process:endpointUrl"
   }
 }
