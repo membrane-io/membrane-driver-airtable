@@ -3,6 +3,7 @@
     "types": [
       {
         "name": "Root",
+        "description": "Driver to manage Airtable data",
         "fields": [
           {
             "name": "tables",
@@ -12,6 +13,27 @@
           {
             "name": "status",
             "type": "String"
+          },
+          {
+            "name": "parse",
+            "type": "List",
+            "hints": {
+              "hidden": false
+            },
+            "ofType": {
+              "type": "Ref",
+              "ofType": "Table"
+            },
+            "params": [
+              {
+                "name": "name",
+                "type": "String"
+              },
+              {
+                "name": "value",
+                "type": "String"
+              }
+            ]
           }
         ],
         "actions": [
@@ -298,5 +320,19 @@
   "dependencies": {
     "http": "http:",
     "endpoint": "sys-process:endpointUrl"
+  },
+  "expressions": {
+    "table": {
+      "description": "Table",
+      "type": "url",
+      "searchIn": "https://airtable.com",
+      "regex": "https://airtable.com/[^/]+/tbl[^/]+$"
+    },
+    "record": {
+      "description": "Record",
+      "type": "url",
+      "searchIn": "https://airtable.com",
+      "regex": "https://airtable.com/[^/]+/tbl[^/]+/[^/]+/rec[^/]+$"
+    }
   }
 }

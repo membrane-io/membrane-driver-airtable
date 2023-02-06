@@ -47,6 +47,20 @@ export const Root = {
     }
   },
   tables: () => ({}),
+  parse: async ({ args: { name, value } }) => {
+    switch (name) {
+      case "table": {
+        const url = new URL(value);
+        const [, , tableId] = url.pathname.split("/");
+        return [root.tables.one({ id: tableId })];
+      }
+      case "record": {
+        const url = new URL(value);
+        const [, , tableId, , recordId] = url.pathname.split("/");
+        return [root.tables.one({ id: tableId }).records.one({ id: recordId })];
+      }
+    }
+  },
   configure: async ({ args: { API_KEY, BASE_ID } }) => {
     state.endpointUrl = state.endpointUrl ?? (await nodes.endpoint.$get());
     state.API_KEY = API_KEY;
