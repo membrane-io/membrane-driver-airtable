@@ -11,8 +11,7 @@ data.records:write
 schema.bases:read
 webhook:manage
 ```
-Configure the connector to use the Token and [Base ID](https://support.airtable.com/docs/understanding-airtable-ids)
-
+Invoke the :configure action with the API Token and [Base ID](https://support.airtable.com/docs/understanding-airtable-ids)
 
 $~~~~$ `mctl action 'airtable:configure(API_KEY:"<Token>",BASE_ID:"<BaseId>")'`
 
