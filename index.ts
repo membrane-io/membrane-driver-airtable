@@ -62,7 +62,7 @@ export const Root = {
     }
   },
   configure: async ({ args: { API_KEY, BASE_ID } }) => {
-    state.endpointUrl = state.endpointUrl ?? (await nodes.endpoint.$get());
+    state.endpointUrl = state.endpointUrl ?? (await nodes.endpoint);
     state.API_KEY = API_KEY;
     state.BASE_ID = BASE_ID;
   },
