@@ -71,7 +71,7 @@ export const Root = {
 export const Tests = {
   testGetTables: async () => {
     const items = await root.tables.page.items.$query(`{ id }`);
-    return Array.isArray(items) && (items.length === 0 || items.length > 0);
+    return Array.isArray(items) && typeof items.length === 'number';
   },
 };
 
