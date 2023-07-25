@@ -11,6 +11,32 @@
   },
   "imports": [
     {
+      "name": "sys-process",
+      "schema": {
+        "types": [
+          {
+            "name": "Root",
+            "description": "",
+            "actions": [],
+            "fields": [
+              {
+                "name": "endpointUrl",
+                "description": "Gets the program's own endpoint URL",
+                "type": "String",
+                "params": [],
+                "hints": {}
+              }
+            ],
+            "events": []
+          }
+        ],
+        "imports": []
+      },
+      "source": {
+        "Program": "tbd"
+      }
+    },
+    {
       "name": "http",
       "schema": {
         "types": [
@@ -33,13 +59,13 @@
                     "name": "headers",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   },
                   {
                     "name": "body",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   }
                 ],
                 "hints": {}
@@ -59,13 +85,13 @@
                     "name": "headers",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   },
                   {
                     "name": "body",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   }
                 ],
                 "hints": {}
@@ -85,13 +111,13 @@
                     "name": "headers",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   },
                   {
                     "name": "body",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   }
                 ],
                 "hints": {}
@@ -111,16 +137,56 @@
                     "name": "headers",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   },
                   {
                     "name": "body",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   }
                 ],
                 "hints": {}
+              },
+              {
+                "name": "endpoint",
+                "description": "The endpoint action",
+                "type": "String",
+                "params": [
+                  {
+                    "name": "method",
+                    "description": "HTTP method",
+                    "type": "String",
+                    "optional": false
+                  },
+                  {
+                    "name": "path",
+                    "description": "HTTP path",
+                    "type": "String",
+                    "optional": false
+                  },
+                  {
+                    "name": "query",
+                    "description": "HTTP query string, encoded as JSON",
+                    "type": "String",
+                    "optional": true
+                  },
+                  {
+                    "name": "headers",
+                    "description": "HTTP headers, encoded as JSON",
+                    "type": "String",
+                    "optional": false
+                  },
+                  {
+                    "name": "body",
+                    "description": "HTTP body, if any",
+                    "type": "String",
+                    "optional": true
+                  }
+                ],
+                "hints": {
+                  "hidden": true
+                }
               }
             ],
             "fields": [
@@ -146,7 +212,7 @@
                     "name": "headers",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   }
                 ],
                 "hints": {}
@@ -246,13 +312,13 @@
                     "name": "headers",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   },
                   {
                     "name": "body",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   }
                 ],
                 "hints": {}
@@ -272,13 +338,13 @@
                     "name": "headers",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   },
                   {
                     "name": "body",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   }
                 ],
                 "hints": {}
@@ -298,13 +364,13 @@
                     "name": "headers",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   },
                   {
                     "name": "body",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   }
                 ],
                 "hints": {}
@@ -324,13 +390,13 @@
                     "name": "headers",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   },
                   {
                     "name": "body",
                     "description": "",
                     "type": "String",
-                    "optional": false
+                    "optional": true
                   }
                 ],
                 "hints": {}
@@ -846,32 +912,6 @@
             }
           }
         ]
-      },
-      "source": {
-        "Program": "tbd"
-      }
-    },
-    {
-      "name": "sys-process",
-      "schema": {
-        "types": [
-          {
-            "name": "Root",
-            "description": "",
-            "actions": [],
-            "fields": [
-              {
-                "name": "endpointUrl",
-                "description": "Gets the program's own endpoint URL",
-                "type": "String",
-                "params": [],
-                "hints": {}
-              }
-            ],
-            "events": []
-          }
-        ],
-        "imports": []
       },
       "source": {
         "Program": "tbd"

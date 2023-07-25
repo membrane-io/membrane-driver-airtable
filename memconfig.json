@@ -35,6 +35,10 @@
                 "type": "String"
               }
             ]
+          },
+          {
+            "name": "tests",
+            "type": "Tests"
           }
         ],
         "actions": [
@@ -174,11 +178,11 @@
         "actions": [
           {
             "name": "createRecord",
-            "type": "Int",
+            "type": "String",
             "params": [
               {
                 "name": "fields",
-                "type": "String",
+                "type": "Json",
                 "optional": false
               }
             ]
@@ -320,7 +324,7 @@
             "params": [
               {
                 "name": "fields",
-                "type": "String",
+                "type": "Json",
                 "optional": false
               }
             ]
@@ -339,6 +343,15 @@
           {
             "name": "type",
             "type": "String"
+          }
+        ]
+      },
+      {
+        "name": "Tests",
+        "actions": [
+          {
+            "name": "testGetTables",
+            "type": "Boolean"
           }
         ]
       }

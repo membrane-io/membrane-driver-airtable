@@ -68,6 +68,13 @@ export const Root = {
   },
 };
 
+export const Tests = {
+  testGetTables: async () => {
+    const items = await root.tables.page.items.$query(`{ id }`);
+    return Array.isArray(items) && (items.length === 0 || items.length > 0);
+  }
+};
+
 export const TableCollection = {
   async one({ args, self }) {
     const res = await api("GET", baseUrl, `meta/bases/${state.BASE_ID}/tables`);
@@ -90,10 +97,15 @@ export const Table = {
   records() {
     return {};
   },
-  async createRecord({ args, self }) {
+  async createRecord({ args: { fields }, self }) {
     const { id } = self.$argsAt(root.tables.one);
-    const fields = JSON.parse(args.fields);
-    await api("POST", baseUrl, `${id}`, null, JSON.stringify({ records: [{ fields }] }));
+    await api(
+      "POST",
+      baseUrl,
+      `${state.BASE_ID}/${id}`,
+      null,
+      JSON.stringify(fields)
+    );
   },
   changed: {
     async subscribe({ self }) {
@@ -108,7 +120,11 @@ export const Table = {
         .filter((id) => state.webhooks[id].tableId === tableId)
         .map((id) => state.webhooks[id]);
       delete state.webhooks[webhook.id];
-      return await api("DELETE", baseUrl, `bases/${state.BASE_ID}/webhooks/${webhook.id}`);
+      return await api(
+        "DELETE",
+        baseUrl,
+        `bases/${state.BASE_ID}/webhooks/${webhook.id}`
+      );
     },
   },
 };
@@ -137,7 +153,9 @@ export let RecordPage = {
     }
     const { id } = self.$argsAt(root.tables.one);
     const args = self.$argsAt(root.tables.one.records.one);
-    return root.tables.one({ id }).records.page({ ...args, offset: obj.offset });
+    return root.tables
+      .one({ id })
+      .records.page({ ...args, offset: obj.offset });
   },
   items({ obj }) {
     return obj.records;
@@ -155,11 +173,16 @@ export const Record = {
     const { id } = self.$argsAt(root.tables.one.records.one);
     await api("DELETE", baseUrl, `${state.BASE_ID}/${table}/${id}`);
   },
-  async updateRecord({ args, self }) {
+  async updateRecord({ args: { fields }, self }) {
     const { id: table } = self.$argsAt(root.tables.one);
     const { id } = self.$argsAt(root.tables.one.records.one);
-    const fields = JSON.parse(args.fields);
-    await api("PATCH", baseUrl, `${state.BASE_ID}/${table}/${id}`, null, JSON.stringify({ fields }));
+    await api(
+      "PATCH",
+      baseUrl,
+      `${state.BASE_ID}/${table}/${id}`,
+      null,
+      JSON.stringify({ fields })
+    );
   },
   fields({ obj }) {
     return JSON.stringify(obj.fields);
@@ -219,7 +242,9 @@ export async function endpoint({ args: { path, query, headers, body } }) {
 }
 
 async function dispatchEvent(tableId: string, recordId: string, type: string) {
-  const record: any = root.tables.one({ id: tableId }).records.one({ id: recordId });
+  const record: any = root.tables
+    .one({ id: tableId })
+    .records.one({ id: recordId });
   return root.tables.one({ id: tableId }).changed.$emit({ record, type });
 }
 
@@ -235,21 +260,33 @@ async function ensureWebhook(tableId: string) {
       },
     },
   };
-  const res = await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks`, null, JSON.stringify(body));
+  const res = await api(
+    "POST",
+    baseUrl,
+    `bases/${state.BASE_ID}/webhooks`,
+    null,
+    JSON.stringify(body)
+  );
   const webhook = await res.json();
 
   if (webhook.id) {
     // refresh in 6 days
-    await root.refreshWebhook({ id: webhook.id }).$invokeIn({ seconds: 60 * 60 * 24 * 6, key: webhook.id });
+    await root
+      .refreshWebhook({ id: webhook.id })
+      .$invokeIn(60 * 60 * 24 * 6);
   }
   return webhook;
 }
 
 export async function refreshWebhook({ args: { id } }) {
   if (!state.webhooks[id]) {
-    return console.log(`Error refreshing the webhook ${id}, not found in this program.`);
+    return console.log(
+      `Error refreshing the webhook ${id}, not found in this program.`
+    );
   }
   await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
   // ???
-  await root.refreshWebhook({ id }).$invokeIn({ seconds: 60 * 60 * 24 * 6, key: id }); 
+  await root
+    .refreshWebhook({ id })
+    .$invokeIn(60 * 60 * 24 * 6);
 }
