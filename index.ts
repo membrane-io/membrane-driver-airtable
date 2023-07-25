@@ -72,7 +72,7 @@ export const Tests = {
   testGetTables: async () => {
     const items = await root.tables.page.items.$query(`{ id }`);
     return Array.isArray(items) && (items.length === 0 || items.length > 0);
-  }
+  },
 };
 
 export const TableCollection = {
@@ -271,9 +271,7 @@ async function ensureWebhook(tableId: string) {
 
   if (webhook.id) {
     // refresh in 6 days
-    await root
-      .refreshWebhook({ id: webhook.id })
-      .$invokeIn(60 * 60 * 24 * 6);
+    await root.refreshWebhook({ id: webhook.id }).$invokeIn(60 * 60 * 24 * 6);
   }
   return webhook;
 }
@@ -286,7 +284,5 @@ export async function refreshWebhook({ args: { id } }) {
   }
   await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
   // ???
-  await root
-    .refreshWebhook({ id })
-    .$invokeIn(60 * 60 * 24 * 6);
+  await root.refreshWebhook({ id }).$invokeIn(60 * 60 * 24 * 6);
 }
