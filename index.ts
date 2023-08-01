@@ -99,13 +99,8 @@ export const Table = {
   },
   async createRecord({ args: { fields }, self }) {
     const { id } = self.$argsAt(root.tables.one);
-    await api(
-      "POST",
-      baseUrl,
-      `${state.BASE_ID}/${id}`,
-      null,
-      JSON.stringify(fields)
-    );
+    const { name } = await root.tables.one({ id }).$query(`{ name }`);
+    await api("POST", baseUrl, `${state.BASE_ID}/${name}`, null, JSON.stringify({ records: [{ fields }] }));
   },
   changed: {
     async subscribe({ self }) {
