@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { state, nodes, root } from "membrane";
 
 const baseUrl = `api.airtable.com/v0`;
@@ -47,7 +46,7 @@ export const Root = {
     }
   },
   tables: () => ({}),
-  parse: async ({ args: { name, value } }) => {
+  parse: async ({ name, value }) => {
     switch (name) {
       case "table": {
         const url = new URL(value);
@@ -61,7 +60,7 @@ export const Root = {
       }
     }
   },
-  configure: async ({ args: { API_KEY, BASE_ID } }) => {
+  configure: async ({ API_KEY, BASE_ID }) => {
     state.endpointUrl = state.endpointUrl ?? (await nodes.endpoint);
     state.API_KEY = API_KEY;
     state.BASE_ID = BASE_ID;
@@ -76,13 +75,13 @@ export const Tests = {
 };
 
 export const TableCollection = {
-  async one({ args, self }) {
+  async one(args, { self }) {
     const res = await api("GET", baseUrl, `meta/bases/${state.BASE_ID}/tables`);
     const { tables } = await res.json();
 
     return tables.find((table) => table.id === args.id);
   },
-  async page({ args, self }) {
+  async page(args, { self }) {
     const res = await api("GET", baseUrl, `meta/bases/${state.BASE_ID}/tables`);
     const { tables } = await res.json();
 
@@ -91,25 +90,31 @@ export const TableCollection = {
 };
 
 export const Table = {
-  gref({ obj, self }) {
+  gref(_, { obj, self }) {
     return root.tables.one({ id: obj.id });
   },
   records() {
     return {};
   },
-  async createRecord({ args: { fields }, self }) {
+  async createRecord({ fields }, { self }) {
     const { id } = self.$argsAt(root.tables.one);
     const { name } = await root.tables.one({ id }).$query(`{ name }`);
-    await api("POST", baseUrl, `${state.BASE_ID}/${name}`, null, JSON.stringify({ records: [{ fields }] }));
+    await api(
+      "POST",
+      baseUrl,
+      `${state.BASE_ID}/${name}`,
+      null,
+      JSON.stringify({ records: [{ fields }] })
+    );
   },
   changed: {
-    async subscribe({ self }) {
+    async subscribe(_, { self }) {
       const { id: tableId } = self.$argsAt(root.tables.one);
 
       const webhook = await ensureWebhook(tableId);
       state.webhooks[webhook.id] = { ...webhook, cursor: 1, tableId };
     },
-    async unsubscribe({ self }) {
+    async unsubscribe(_, { self }) {
       const { id: tableId } = self.$argsAt(root.tables.one);
       const webhook: any = Object.keys(state.webhooks)
         .filter((id) => state.webhooks[id].tableId === tableId)
@@ -125,13 +130,13 @@ export const Table = {
 };
 
 export const RecordCollection = {
-  async one({ args, self }) {
+  async one(args, { self }) {
     const { id } = self.$argsAt(root.tables.one);
     const res = await api("GET", baseUrl, `${state.BASE_ID}/${id}/${args.id}`);
 
     return await res.json();
   },
-  async page({ args, self }) {
+  async page(args, { self }) {
     const { id } = self.$argsAt(root.tables.one);
     const res = await api("GET", baseUrl, `${state.BASE_ID}/${id}`, {
       ...args,
@@ -142,7 +147,7 @@ export const RecordCollection = {
 };
 
 export let RecordPage = {
-  next({ self, obj }) {
+  next(_, { self, obj }) {
     if (obj.offset === undefined) {
       return null;
     }
@@ -152,23 +157,23 @@ export let RecordPage = {
       .one({ id })
       .records.page({ ...args, offset: obj.offset });
   },
-  items({ obj }) {
+  items(_, { obj }) {
     return obj.records;
   },
 };
 
 export const Record = {
-  gref({ obj, self }) {
+  gref(_, { obj, self }) {
     const { id } = self.$argsAt(root.tables.one);
 
     return root.tables.one({ id }).records.one({ id: obj.id });
   },
-  async deleteRecord({ args, self }) {
+  async deleteRecord(args, { self }) {
     const { id: table } = self.$argsAt(root.tables.one);
     const { id } = self.$argsAt(root.tables.one.records.one);
     await api("DELETE", baseUrl, `${state.BASE_ID}/${table}/${id}`);
   },
-  async updateRecord({ args: { fields }, self }) {
+  async updateRecord({ fields }, { self }) {
     const { id: table } = self.$argsAt(root.tables.one);
     const { id } = self.$argsAt(root.tables.one.records.one);
     await api(
@@ -179,12 +184,12 @@ export const Record = {
       JSON.stringify({ fields })
     );
   },
-  fields({ obj }) {
+  fields(_, { obj }) {
     return JSON.stringify(obj.fields);
   },
 };
 
-export async function endpoint({ args: { path, query, headers, body } }) {
+export async function endpoint({ path, query, headers, body }) {
   switch (path) {
     case "/incoming-webhook": {
       const event = JSON.parse(body);
@@ -271,7 +276,7 @@ async function ensureWebhook(tableId: string) {
   return webhook;
 }
 
-export async function refreshWebhook({ args: { id } }) {
+export async function refreshWebhook({ id }) {
   if (!state.webhooks[id]) {
     return console.log(
       `Error refreshing the webhook ${id}, not found in this program.`
