@@ -38,7 +38,7 @@ async function api(
 export const Root = {
   status() {
     if (!state.API_KEY) {
-      return "Please [configure the Airtable token](https://airtable.com/account)";
+      return "Please [get an API key](https://airtable.com/account) and [configure](:configure) it";
     } else if (!state.BASE_ID) {
       return "[Base ID](https://support.airtable.com/docs/understanding-airtable-ids) Not configured";
     } else {
