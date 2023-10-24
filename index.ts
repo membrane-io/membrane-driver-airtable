@@ -25,7 +25,7 @@ async function api(
   const querystr =
     query && Object.keys(query).length ? `?${new URLSearchParams(query)}` : "";
 
-  return await fetch(`https://${domain}/${path}${querystr}`, {
+  const res = await fetch(`https://${domain}/${path}${querystr}`, {
     method,
     body,
     headers: {
@@ -33,6 +33,11 @@ async function api(
       "Content-Type": "application/json",
     },
   });
+
+  if (res.status >= 300) {
+    throw new Error(`Airtable Error ${res.status}: ${await res.text()}`);
+  }
+  return res;
 }
 
 export const Root = {
