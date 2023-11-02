@@ -43,7 +43,7 @@ async function api(
 export const Root = {
   status() {
     if (!state.API_KEY) {
-      return "Please [get an API key](https://airtable.com/account) and [configure](:configure) it";
+      return "Please [get an API token](https://airtable.com/create/tokens) and [configure](:configure) it";
     } else if (!state.BASE_ID) {
       return "[Base ID](https://support.airtable.com/docs/understanding-airtable-ids) Not configured";
     } else {
@@ -189,9 +189,6 @@ export const Record = {
       null,
       JSON.stringify({ fields })
     );
-  },
-  fields(_, { obj }) {
-    return JSON.stringify(obj.fields);
   },
 };
 

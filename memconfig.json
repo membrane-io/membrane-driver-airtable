@@ -314,7 +314,7 @@
           },
           {
             "name": "fields",
-            "type": "String"
+            "type": "Json"
           }
         ],
         "actions": [
