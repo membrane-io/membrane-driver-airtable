@@ -183,19 +183,34 @@
         "actions": [
           {
             "name": "createRecord",
-            "type": "String",
+            "type": "Json",
             "params": [
               {
                 "name": "fields",
                 "type": "Json",
                 "optional": false
               }
-            ]
+            ],
+            "ofType": "Record"
           },
           {
             "name": "createWebhook",
             "type": "Int",
             "params": []
+          },
+          {
+            "name": "upsertRecord",
+            "type": "Json",
+            "params": [
+              {
+                "name": "fields",
+                "type": "Json"
+              },
+              {
+                "name": "fieldsToMergeOn",
+                "type": "Json"
+              }
+            ]
           }
         ],
         "events": [

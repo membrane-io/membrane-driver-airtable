@@ -81,13 +81,13 @@ export const Tests = {
 };
 
 export const TableCollection = {
-  async one(args, { self }) {
+  async one(args) {
     const res = await api("GET", baseUrl, `meta/bases/${state.BASE_ID}/tables`);
     const { tables } = await res.json();
 
     return tables.find((table) => table.id === args.id);
   },
-  async page(args, { self }) {
+  async page() {
     const res = await api("GET", baseUrl, `meta/bases/${state.BASE_ID}/tables`);
     const { tables } = await res.json();
 
@@ -96,7 +96,7 @@ export const TableCollection = {
 };
 
 export const Table = {
-  gref(_, { obj, self }) {
+  gref(_, { obj }) {
     return root.tables.one({ id: obj.id });
   },
   records() {
@@ -105,13 +105,29 @@ export const Table = {
   async createRecord({ fields }, { self }) {
     const { id } = self.$argsAt(root.tables.one);
     const { name } = await root.tables.one({ id }).$query(`{ name }`);
-    await api(
+    const res = await api(
       "POST",
       baseUrl,
       `${state.BASE_ID}/${name}`,
       null,
       JSON.stringify({ records: [{ fields }] })
     );
+    return await res.json();
+  },
+  async upsertRecord({ fields, fieldsToMergeOn }, { self }) {
+    const { id } = self.$argsAt(root.tables.one);
+    const { name } = await root.tables.one({ id }).$query(`{ name }`);
+    const res = await api(
+      "PATCH",
+      baseUrl,
+      `${state.BASE_ID}/${name}`,
+      null,
+      JSON.stringify({
+        performUpsert: { fieldsToMergeOn },
+        records: [{ fields }],
+      })
+    );
+    return await res.json();
   },
   changed: {
     async subscribe(_, { self }) {
@@ -174,7 +190,7 @@ export const Record = {
 
     return root.tables.one({ id }).records.one({ id: obj.id });
   },
-  async deleteRecord(args, { self }) {
+  async deleteRecord(_, { self }) {
     const { id: table } = self.$argsAt(root.tables.one);
     const { id } = self.$argsAt(root.tables.one.records.one);
     await api("DELETE", baseUrl, `${state.BASE_ID}/${table}/${id}`);
@@ -248,7 +264,9 @@ async function dispatchEvent(tableId: string, recordId: string, type: string) {
   const record: any = root.tables
     .one({ id: tableId })
     .records.one({ id: recordId });
-  return root.tables.one({ id: tableId }).changed.$emit({ record, type });
+  return root.tables
+    .one({ id: tableId })
+    .changed.$emit({ record, type: type as any });
 }
 
 async function ensureWebhook(tableId: string) {
