@@ -33,6 +33,11 @@
               {
                 "name": "value",
                 "type": "String"
+              },
+              {
+                "name": "url",
+                "type": "String",
+                "optional": true
               }
             ]
           },
@@ -390,9 +395,9 @@
     },
     "record": {
       "description": "Record",
-      "type": "url",
+      "type": "text",
       "searchIn": "https://airtable.com",
-      "regex": "https://airtable.com/[^/]+/tbl[^/]+/[^/]+/rec[^/]+$"
+      "regex": "data-rowid=\"([^\"]+)\""
     }
   }
 }

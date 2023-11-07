@@ -51,7 +51,7 @@ export const Root = {
     }
   },
   tables: () => ({}),
-  parse: async ({ name, value }) => {
+  parse: async ({ name, value, url }) => {
     switch (name) {
       case "table": {
         const url = new URL(value);
@@ -59,9 +59,10 @@ export const Root = {
         return [root.tables.one({ id: tableId })];
       }
       case "record": {
-        const url = new URL(value);
-        const [, , tableId, , recordId] = url.pathname.split("/");
-        return [root.tables.one({ id: tableId }).records.one({ id: recordId })];
+        const source = new URL(url);
+        const [, , tableId] = source.pathname.split("/");
+        const [, id] = value.match(/data-rowid="([^"]+)"/);
+        return [root.tables.one({ id: tableId }).records.one({ id })];
       }
     }
   },
