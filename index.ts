@@ -175,7 +175,7 @@ export let RecordPage = {
       return null;
     }
     const { id } = self.$argsAt(root.tables.one);
-    const args = self.$argsAt(root.tables.one.records.one);
+    const args = self.$argsAt(root.tables.one.records.page);
     return root.tables
       .one({ id })
       .records.page({ ...args, offset: obj.offset });
