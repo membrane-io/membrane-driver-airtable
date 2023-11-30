@@ -138,12 +138,14 @@
                 "type": "String",
                 "optional": false
               }
-            ]
+            ],
+            "description": "Represents a single table in Airtable for specific data retrieval and manipulation."
           },
           {
             "name": "page",
             "type": "TablePage",
-            "params": []
+            "params": [],
+            "description": "Represents a page of table data in Airtable for pagination and navigation."
           }
         ],
         "actions": [],
@@ -158,14 +160,16 @@
             "type": "List",
             "ofType": {
               "type": "Table"
-            }
+            },
+            "description": "Represents a list of tables in Airtable for display and processing."
           },
           {
             "name": "next",
             "type": "Ref",
             "ofType": {
               "type": "TablePage"
-            }
+            },
+            "description": "Represents the next page of table data in Airtable for navigation and retrieval."
           }
         ],
         "actions": [],
@@ -177,22 +181,26 @@
         "fields": [
           {
             "name": "id",
-            "type": "String"
+            "type": "String",
+            "description": "The unique identifier of the table."
           },
           {
             "name": "name",
             "type": "String",
             "hints": {
               "primary": true
-            }
+            },
+            "description": "The name of the table."
           },
           {
             "name": "primaryFieldId",
-            "type": "String"
+            "type": "String",
+            "description": "The unique identifier of the primary field."
           },
           {
             "name": "records",
-            "type": "RecordCollection"
+            "type": "RecordCollection",
+            "description": "Represents a collection of records in the table."
           }
         ],
         "actions": [
@@ -206,12 +214,14 @@
                 "optional": false
               }
             ],
-            "ofType": "Record"
+            "ofType": "Record",
+            "description": "Creates a new record in the table with the specified fields."
           },
           {
             "name": "createWebhook",
             "type": "Int",
-            "params": []
+            "params": [],
+            "description": "Creates a webhook for the table."
           },
           {
             "name": "upsertRecord",
@@ -225,14 +235,16 @@
                 "name": "fieldsToMergeOn",
                 "type": "Json"
               }
-            ]
+            ],
+            "description": "Updates or inserts a record in the table based on the specified fields and merge criteria."
           }
         ],
         "events": [
           {
             "name": "changed",
             "type": "TableEvent",
-            "params": []
+            "params": [],
+            "description": "Triggered when the table data changes."
           }
         ],
         "description": "Represents a table in Airtable."
@@ -248,7 +260,8 @@
                 "name": "id",
                 "type": "String"
               }
-            ]
+            ],
+            "description": "Represents a single record in Airtable for specific data retrieval and manipulation."
           },
           {
             "name": "page",
@@ -299,7 +312,8 @@
                 "type": "String",
                 "optional": true
               }
-            ]
+            ],
+            "description": "Represents a page of record data in Airtable for pagination and navigation."
           }
         ],
         "actions": [],
@@ -336,25 +350,29 @@
             "type": "String",
             "hints": {
               "primary": true
-            }
+            },
+            "description": "The unique identifier of the record."
           },
           {
             "name": "createdTime",
             "type": "String",
             "hints": {
               "primary": true
-            }
+            },
+            "description": "The timestamp when the record was created."
           },
           {
             "name": "fields",
-            "type": "Json"
+            "type": "Json",
+            "description": "The fields and their values in the record."
           }
         ],
         "actions": [
           {
             "name": "deleteRecord",
             "type": "Int",
-            "params": []
+            "params": [],
+            "description": "Deletes the record from the table."
           },
           {
             "name": "updateRecord",
@@ -365,7 +383,8 @@
                 "type": "Json",
                 "optional": false
               }
-            ]
+            ],
+            "description": "Updates the fields of the record with the specified values."
           }
         ],
         "events": [],
@@ -377,11 +396,13 @@
           {
             "name": "record",
             "type": "Ref",
-            "ofType": "Record"
+            "ofType": "Record",
+            "description": "The record associated with the event."
           },
           {
             "name": "type",
-            "type": "String"
+            "type": "String",
+            "description": "The type of event triggered."
           }
         ],
         "description": "Handles events related to tables in Airtable."
@@ -391,10 +412,11 @@
         "actions": [
           {
             "name": "testGetTables",
-            "type": "Boolean"
+            "type": "Boolean",
+            "description": "Performs a test to retrieve tables from Airtable."
           }
         ],
-        "description": "Performs tests and validations for the integration with Airtable."
+        "description": "Contains tests for the Membrane-Airtable integration."
       }
     ]
   },
