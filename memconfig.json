@@ -3,16 +3,18 @@
     "types": [
       {
         "name": "Root",
-        "description": "Driver to manage Airtable data",
+        "description": "Manages the integration between Membrane and Airtable.",
         "fields": [
           {
             "name": "tables",
             "type": "TableCollection",
-            "params": []
+            "params": [],
+            "description": "Represents a collection of tables in Airtable."
           },
           {
             "name": "status",
-            "type": "String"
+            "type": "String",
+            "description": "Represents the status of the integration with Airtable."
           },
           {
             "name": "parse",
@@ -39,11 +41,13 @@
                 "type": "String",
                 "optional": true
               }
-            ]
+            ],
+            "description": "Parses the data from Airtable into a list of tables."
           },
           {
             "name": "tests",
-            "type": "Tests"
+            "type": "Tests",
+            "description": "Performs tests and validations for the integration with Airtable."
           }
         ],
         "actions": [
@@ -61,7 +65,8 @@
                 "type": "String",
                 "optional": false
               }
-            ]
+            ],
+            "description": "Configures the Airtable API key and base ID for integration."
           },
           {
             "name": "refreshWebhook",
@@ -74,7 +79,8 @@
                 "name": "id",
                 "type": "String"
               }
-            ]
+            ],
+            "description": "Refreshes the webhook for the specified ID."
           },
           {
             "name": "endpoint",
@@ -108,13 +114,15 @@
                 "type": "String",
                 "optional": false
               }
-            ]
+            ],
+            "description": "Invokes an HTTP endpoint with the specified method, path, body, query, and headers."
           }
         ],
         "events": [
           {
             "name": "statusChanged",
-            "type": "Void"
+            "type": "Void",
+            "description": "Triggered when the status changes."
           }
         ]
       },
@@ -139,7 +147,8 @@
           }
         ],
         "actions": [],
-        "events": []
+        "events": [],
+        "description": "Represents a collection of tables in Airtable."
       },
       {
         "name": "TablePage",
@@ -160,7 +169,8 @@
           }
         ],
         "actions": [],
-        "events": []
+        "events": [],
+        "description": "Represents a page of table data in Airtable."
       },
       {
         "name": "Table",
@@ -224,7 +234,8 @@
             "type": "TableEvent",
             "params": []
           }
-        ]
+        ],
+        "description": "Represents a table in Airtable."
       },
       {
         "name": "RecordCollection",
@@ -292,7 +303,8 @@
           }
         ],
         "actions": [],
-        "events": []
+        "events": [],
+        "description": "Represents a collection of records in Airtable."
       },
       {
         "name": "RecordPage",
@@ -313,7 +325,8 @@
           }
         ],
         "actions": [],
-        "events": []
+        "events": [],
+        "description": "Represents a page of record data in Airtable."
       },
       {
         "name": "Record",
@@ -355,7 +368,8 @@
             ]
           }
         ],
-        "events": []
+        "events": [],
+        "description": "Represents a record in Airtable."
       },
       {
         "name": "TableEvent",
@@ -369,7 +383,8 @@
             "name": "type",
             "type": "String"
           }
-        ]
+        ],
+        "description": "Handles events related to tables in Airtable."
       },
       {
         "name": "Tests",
@@ -378,7 +393,8 @@
             "name": "testGetTables",
             "type": "Boolean"
           }
-        ]
+        ],
+        "description": "Performs tests and validations for the integration with Airtable."
       }
     ]
   },
