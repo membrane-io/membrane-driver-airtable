@@ -137,7 +137,7 @@
                 "name": "id",
                 "type": "String",
                 "optional": false,
-                "description": "The unique identifier of the Airtable table to be accessed."
+                "description": "The table ID. Usually starts with \"tbl\""
               }
             ],
             "description": "Allows access to a specific Airtable table using its unique identifier for operations."
