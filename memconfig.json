@@ -136,21 +136,22 @@
               {
                 "name": "id",
                 "type": "String",
-                "optional": false
+                "optional": false,
+                "description": "The table ID. Usually starts with \"tbl\""
               }
             ],
-            "description": "Represents a single table in Airtable for specific data retrieval and manipulation."
+            "description": "Allows access to a specific Airtable table using its unique identifier for operations."
           },
           {
             "name": "page",
             "type": "TablePage",
             "params": [],
-            "description": "Represents a page of table data in Airtable for pagination and navigation."
+            "description": "Provides access to a subset of records from an Airtable table for handling data in segments."
           }
         ],
         "actions": [],
         "events": [],
-        "description": "Represents a collection of tables in Airtable."
+        "description": "Collection of tables within Airtable that allows for data retrieval and management."
       },
       {
         "name": "TablePage",
@@ -161,7 +162,7 @@
             "ofType": {
               "type": "Table"
             },
-            "description": "Represents a list of tables in Airtable for display and processing."
+            "description": "Collection of tables within the current page in Airtable."
           },
           {
             "name": "next",
@@ -169,12 +170,12 @@
             "ofType": {
               "type": "TablePage"
             },
-            "description": "Represents the next page of table data in Airtable for navigation and retrieval."
+            "description": "Link to the next set of table data in a paginated Airtable sequence."
           }
         ],
         "actions": [],
         "events": [],
-        "description": "Represents a page of table data in Airtable."
+        "description": "A page containing a section of Airtable tables."
       },
       {
         "name": "Table",
@@ -258,10 +259,11 @@
             "params": [
               {
                 "name": "id",
-                "type": "String"
+                "type": "String",
+                "description": "The unique identifier of a record in the Airtable base."
               }
             ],
-            "description": "Represents a single record in Airtable for specific data retrieval and manipulation."
+            "description": "Allows access to a specified record by its ID for operations such as retrieval or modification."
           },
           {
             "name": "page",
@@ -270,55 +272,64 @@
               {
                 "name": "offset",
                 "type": "String",
-                "optional": true
+                "optional": true,
+                "description": "The offset from where to start retrieving records (used for pagination)."
               },
               {
                 "name": "filterByFormula",
                 "type": "String",
-                "optional": true
+                "optional": true,
+                "description": "A formula to filter records. Only records which satisfy the formula will be returned."
               },
               {
                 "name": "maxRecords",
                 "type": "Int",
-                "optional": true
+                "optional": true,
+                "description": "The maximum number of records to return during a single request."
               },
               {
                 "name": "pageSize",
                 "type": "Int",
-                "optional": true
+                "optional": true,
+                "description": "The number of records returned in each page of results."
               },
               {
                 "name": "sort",
                 "type": "String",
-                "optional": true
+                "optional": true,
+                "description": "A JSON string that specifies the fields to sort by and their corresponding sort direction."
               },
               {
                 "name": "view",
                 "type": "String",
-                "optional": true
+                "optional": true,
+                "description": "The name of the view in Airtable to display the records."
               },
               {
                 "name": "cellFormat",
                 "type": "String",
-                "optional": true
+                "optional": true,
+                "description": "The format for the cell values. Can be 'json' or 'string'."
               },
               {
                 "name": "timeZone",
                 "type": "String",
-                "optional": true
+                "optional": true,
+                "description": "The time zone that should be used to format time data types."
               },
               {
                 "name": "userLocale",
                 "type": "String",
-                "optional": true
+                "optional": true,
+                "description": "The user locale to use for formatting localized data types."
               }
             ],
-            "description": "Represents a page of record data in Airtable for pagination and navigation."
+            "description": "Allows retrieval of records in a paginated format, supporting various filters and sorting options."
           }
         ],
         "actions": [],
         "events": [],
-        "description": "Represents a collection of records in Airtable."
+        "description": "Collection of Airtable records."
       },
       {
         "name": "RecordPage",
@@ -328,19 +339,21 @@
             "type": "List",
             "ofType": {
               "type": "Record"
-            }
+            },
+            "description": "Collection of Airtable records within the current page."
           },
           {
             "name": "next",
             "type": "Ref",
             "ofType": {
               "type": "RecordPage"
-            }
+            },
+            "description": "Reference to the next RecordPage for pagination purposes."
           }
         ],
         "actions": [],
         "events": [],
-        "description": "Represents a page of record data in Airtable."
+        "description": "Represents a single page of Airtable records, often used for pagination."
       },
       {
         "name": "Record",
@@ -351,7 +364,7 @@
             "hints": {
               "primary": true
             },
-            "description": "The unique identifier of the record."
+            "description": "Unique identifier for the Airtable record."
           },
           {
             "name": "createdTime",
@@ -359,12 +372,12 @@
             "hints": {
               "primary": true
             },
-            "description": "The timestamp when the record was created."
+            "description": "Creation timestamp of the Airtable record."
           },
           {
             "name": "fields",
             "type": "Json",
-            "description": "The fields and their values in the record."
+            "description": "Data fields containing the values for the Airtable record."
           }
         ],
         "actions": [
@@ -372,7 +385,7 @@
             "name": "deleteRecord",
             "type": "Int",
             "params": [],
-            "description": "Deletes the record from the table."
+            "description": "Action to remove the Airtable record from its table."
           },
           {
             "name": "updateRecord",
@@ -381,14 +394,15 @@
               {
                 "name": "fields",
                 "type": "Json",
-                "optional": false
+                "optional": false,
+                "description": "JSON object containing the field values to update the Airtable record with."
               }
             ],
-            "description": "Updates the fields of the record with the specified values."
+            "description": "Action to modify the data fields of the Airtable record."
           }
         ],
         "events": [],
-        "description": "Represents a record in Airtable."
+        "description": "Representation of a single Airtable record."
       },
       {
         "name": "TableEvent",
@@ -397,15 +411,15 @@
             "name": "record",
             "type": "Ref",
             "ofType": "Record",
-            "description": "The record associated with the event."
+            "description": "Refers to the Airtable record involved in the event."
           },
           {
             "name": "type",
             "type": "String",
-            "description": "The type of event triggered."
+            "description": "Specifies the category of the table event that occurred."
           }
         ],
-        "description": "Handles events related to tables in Airtable."
+        "description": "Represents events pertaining to Airtable tables."
       },
       {
         "name": "Tests",
