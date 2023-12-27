@@ -104,24 +104,48 @@ export const Table = {
     return {};
   },
   async createRecord({ fields }, { self }) {
-    const { id } = self.$argsAt(root.tables.one);
-    const { name } = await root.tables.one({ id }).$query(`{ name }`);
+    const { id: tableId } = self.$argsAt(root.tables.one);
     const res = await api(
       "POST",
       baseUrl,
-      `${state.BASE_ID}/${name}`,
+      `${state.BASE_ID}/${tableId}`,
       null,
       JSON.stringify({ records: [{ fields }] })
     );
     return await res.json();
   },
-  async upsertRecord({ fields, fieldsToMergeOn }, { self }) {
-    const { id } = self.$argsAt(root.tables.one);
-    const { name } = await root.tables.one({ id }).$query(`{ name }`);
+  async updateRecord({ id, fields }, { self }) {
+    const { id: tableId } = self.$argsAt(root.tables.one);
     const res = await api(
       "PATCH",
       baseUrl,
-      `${state.BASE_ID}/${name}`,
+      `${state.BASE_ID}/${tableId}`,
+      null,
+      JSON.stringify({
+        records: [{ id, fields }],
+      })
+    );
+    return await res.json();
+  },
+  async replaceRecord({ id, fields }, { self }) {
+    const { id: tableId } = self.$argsAt(root.tables.one);
+    const res = await api(
+      "PUT",
+      baseUrl,
+      `${state.BASE_ID}/${tableId}`,
+      null,
+      JSON.stringify({
+        records: [{ id, fields }],
+      })
+    );
+    return await res.json();
+  },
+  async upsertRecord({ fields, fieldsToMergeOn }, { self }) {
+    const { id: tableId } = self.$argsAt(root.tables.one);
+    const res = await api(
+      "PATCH",
+      baseUrl,
+      `${state.BASE_ID}/${tableId}`,
       null,
       JSON.stringify({
         performUpsert: { fieldsToMergeOn },

@@ -237,7 +237,37 @@
                 "type": "Json"
               }
             ],
-            "description": "Updates or inserts a record in the table based on the specified fields and merge criteria."
+            "description": "Updates or inserts a record in the table. The id field of records is optional. Records that do not include id will use the fields chosen by fieldsToMergeOn as an external ID to match with existing records. fieldsToMergeOn must be an array with 1-3 field names or IDs."
+          },
+          {
+            "name": "updateRecord",
+            "type": "Void",
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              },
+              {
+                "name": "fields",
+                "type": "Json"
+              }
+            ],
+            "description": "Updates a table record identified by the provided record ID."
+          },
+          {
+            "name": "replaceRecord",
+            "type": "Void",
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              },
+              {
+                "name": "fields",
+                "type": "Json"
+              }
+            ],
+            "description": "Replaces a table record identified by the provided record ID."
           }
         ],
         "events": [
