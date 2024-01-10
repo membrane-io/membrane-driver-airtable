@@ -116,6 +116,16 @@
               }
             ],
             "description": "Invokes an HTTP endpoint with the specified method, path, body, query, and headers."
+          },
+          {
+            "name": "handleWebhooks",
+            "type": "Void",
+            "params": [
+              {
+                "name": "id",
+                "type": "String"
+              }
+            ]
           }
         ],
         "events": [
