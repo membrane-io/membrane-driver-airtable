@@ -242,7 +242,8 @@ export async function endpoint({ path, query, headers, body }) {
       const timers = state.webhooksTimers;
       if (timers[id]) {
         unsubscribe(timers[id]);
-       }
+      }
+      timers[id] = await root.handleWebhooks({ id }).$invokeIn(5);
       break;
     }
     default:
@@ -314,9 +315,7 @@ export async function handleWebhooks({ id }) {
   const { payloads, cursor } = await res.json();
 
   // Update the cursor in the webhook configuration
-  if (config) {
-    config.cursor = cursor;
-  }
+  config.cursor = cursor;
 
   const events: any[] = [];
   for (const payload of payloads) {
