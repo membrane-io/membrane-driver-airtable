@@ -315,8 +315,10 @@ export async function handleWebhooks({ id }) {
   const { payloads, cursor } = await res.json();
 
   // Update the cursor in the webhook configuration
-  config.cursor = cursor;
-
+  if (cursor) {
+    config.cursor = cursor;
+  }
+  
   const events: any[] = [];
   for (const payload of payloads) {
     if ("changedTablesById" in payload) {
