@@ -318,13 +318,11 @@ export async function handleWebhooks({ id }) {
   if (cursor) {
     config.cursor = cursor;
   }
-  
+
   const events: any[] = [];
   for (const payload of payloads) {
     if ("changedTablesById" in payload) {
-      for (const tableId in payload.changedTablesById) {
-        const table = payload.changedTablesById[tableId];
-
+      for (const [tableId, table] of Object.entries(payload.changedTablesById) as [string, any][]) {
         // Check for created records and push a "created" event
         if ("createdRecordsById" in table) {
           for (const recordId in table.createdRecordsById) {
@@ -365,4 +363,3 @@ export async function handleWebhooks({ id }) {
     await dispatchEvent(tableId, recordId, type);
   }
 }
- 
