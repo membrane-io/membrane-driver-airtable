@@ -243,7 +243,7 @@ export async function endpoint({ path, query, headers, body }) {
       if (timers[id]) {
         unsubscribe(timers[id]);
       }
-      timers[id] = await root.handleWebhooks({ id }).$invokeIn(5);
+      timers[id] = root.handleWebhooks({ id }).$invokeIn(5);
       break;
     }
     default:
