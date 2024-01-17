@@ -5,6 +5,7 @@ const baseUrl = `api.airtable.com/v0`;
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 state.webhooks = state.webhooks ?? {};
+state.webhooksTimers = state.webhooksTimers ?? {};
 
 async function api(
   method: Method,
@@ -237,47 +238,12 @@ export async function endpoint({ path, query, headers, body }) {
   switch (path) {
     case "/incoming-webhook": {
       const event = JSON.parse(body);
-      const webhookId = event.webhook.id;
-      const config = state.webhooks[webhookId];
-      if (!config) {
-        throw new Error(`Webhook ${webhookId} is not part of this program`);
+      const id = event.webhook.id;
+      const timers = state.webhooksTimers;
+      if (timers[id]) {
+        unsubscribe(timers[id]);
       }
-      const res = await api(
-        "GET",
-        baseUrl,
-        `bases/${state.BASE_ID}/webhooks/${webhookId}/payloads`,
-        { cursor: config.cursor }
-      );
-      const { payloads, cursor } = await res.json();
-
-      if (config) {
-        config.cursor = cursor;
-      }
-
-      for (const payload of payloads) {
-        if ("changedTablesById" in payload) {
-          for (const tableId in payload.changedTablesById) {
-            const table = payload.changedTablesById[tableId];
-            if ("createdRecordsById" in table) {
-              for (const recordId in table.createdRecordsById) {
-                dispatchEvent(tableId, recordId, "created");
-              }
-            }
-
-            if ("changedRecordsById" in table) {
-              for (const recordId in table.changedRecordsById) {
-                dispatchEvent(tableId, recordId, "changed");
-              }
-            }
-
-            if ("destroyedRecordIds" in table) {
-              for (const recordId in table.destroyedRecordIds) {
-                dispatchEvent(tableId, recordId, "destroyed");
-              }
-            }
-          }
-        }
-      }
+      timers[id] = root.handleWebhooks({ id }).$invokeIn(5);
       break;
     }
     default:
@@ -329,6 +295,71 @@ export async function refreshWebhook({ id }) {
     );
   }
   await api("POST", baseUrl, `bases/${state.BASE_ID}/webhooks/${id}/refresh`);
-  // ???
-  await root.refreshWebhook({ id }).$invokeIn(60 * 60 * 24 * 6);
+
+  root.refreshWebhook({ id }).$invokeIn(60 * 60 * 24 * 6);
+}
+
+export async function handleWebhooks({ id }) {
+  // Retrieve the webhook configuration for the given 'id' from the state
+  const config = state.webhooks[id];
+  if (!config) {
+    throw new Error(`Webhook ${id} is not part of this program`);
+  }
+
+  const res = await api(
+    "GET",
+    baseUrl,
+    `bases/${state.BASE_ID}/webhooks/${id}/payloads`,
+    { cursor: config.cursor }
+  );
+  const { payloads, cursor } = await res.json();
+
+  // Update the cursor in the webhook configuration
+  if (cursor) {
+    config.cursor = cursor;
+  }
+
+  const events: any[] = [];
+  for (const payload of payloads) {
+    if ("changedTablesById" in payload) {
+      for (const [tableId, table] of Object.entries(payload.changedTablesById) as [string, any][]) {
+        // Check for created records and push a "created" event
+        if ("createdRecordsById" in table) {
+          for (const recordId in table.createdRecordsById) {
+            events.push([tableId, recordId, "created"]);
+          }
+        }
+
+        // Check for changed records and push a "changed" event
+        // if the last event is always a changed event, before
+        // the 5 second delay skip, this is to prevent duplicate events.
+        if ("changedRecordsById" in table) {
+          for (const recordId in table.changedRecordsById) {
+            const lastEvent = events[events.length - 1];
+            if (
+              lastEvent &&
+              lastEvent[0] === tableId &&
+              lastEvent[1] === recordId &&
+              lastEvent[2] === "changed"
+            ) {
+              continue;
+            }
+            events.push([tableId, recordId, "changed"]);
+          }
+        }
+
+        // Check for destroyed record IDs and push a "destroyed" event
+        if ("destroyedRecordIds" in table) {
+          for (const recordId of table.destroyedRecordIds) {
+            events.push([tableId, recordId, "destroyed"]);
+          }
+        }
+      }
+    }
+  }
+
+  // Loop through the collected events and dispatch them
+  for (const [tableId, recordId, type] of events) {
+    await dispatchEvent(tableId, recordId, type);
+  }
 }
