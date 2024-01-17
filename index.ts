@@ -5,7 +5,7 @@ const baseUrl = `api.airtable.com/v0`;
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 state.webhooks = state.webhooks ?? {};
-state.webhooksTimers = state.webhooksTimers ?? [];
+state.webhooksTimers = state.webhooksTimers ?? {};
 
 async function api(
   method: Method,
